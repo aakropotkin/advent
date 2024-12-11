@@ -40,7 +40,6 @@ def is_valid(rules, update)
   return true
 end
 
-
 invalids = []
 for update in updates
   if !is_valid(rules, update)
