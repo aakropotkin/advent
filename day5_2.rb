@@ -40,10 +40,36 @@ def is_valid(rules, update)
   return true
 end
 
-sum = 0
+
+invalids = []
 for update in updates
-  if is_valid(rules, update)
-    sum += update[(update.length/2).floor]
+  if !is_valid(rules, update)
+    invalids << update
   end
+end
+
+fixeds = []
+for update in invalids
+  fixed = []
+  for x in update
+    if fixed.empty?
+      fixed << x
+    else
+      for i in 0..fixed.length
+        maybe = fixed.dup
+        maybe.insert(i, x)
+        if is_valid(rules, maybe)
+          fixed = maybe
+          break
+        end
+      end
+    end
+  end
+  fixeds << fixed
+end
+
+sum = 0
+for update in fixeds
+  sum += update[(update.length/2).floor]
 end
 puts sum
