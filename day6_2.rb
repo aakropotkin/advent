@@ -20,7 +20,6 @@ for x in 0..MAT.length-1
   break if $start_direction != ''
 end
 
-
 WORKING = 0
 LOOPED  = 1
 EXITED  = 2
@@ -28,7 +27,9 @@ EXITED  = 2
 class Solver
   def initialize(block_x, block_y)
     @mat = MAT.map(&:dup)
-    @mat[block_x][block_y] = '#'
+    if block_x != -1 && block_y != -1
+      @mat[block_x][block_y] = '#'
+    end
     @x = $start_x
     @y = $start_y
     @direction = $start_direction
@@ -90,16 +91,37 @@ class Solver
     end
     return @status == LOOPED
   end
+
+  def status
+    return @status
+  end
+
+  def set_status(new_status)
+    @status = new_status
+  end
+
+  def x
+    return @x
+  end
+
+  def y
+    return @y
+  end
+end
+
+# Find original path
+positions = []
+base = Solver.new(-1, -1)
+while base.status == WORKING
+  base.set_status(base.move())
+  positions << [base.x, base.y] unless base.status == EXITED
 end
 
 loops = 0
-for x in 0...MAT.length-1
-  for y in 0...MAT[x].length-1
-    next unless MAT[x][y] == '.'
-    solver = Solver.new(x, y)
-    if solver.loop?()
-      loops += 1
-    end
+for pos in positions
+  solver = Solver.new(pos[0], pos[1])
+  if solver.loop?()
+    loops += 1
   end
 end
 puts loops
