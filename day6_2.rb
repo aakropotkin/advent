@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-MAT = File.readlines('day6_simple.in', chomp: true).map(&:chars)
+MAT = File.readlines('day6.in', chomp: true).map(&:chars)
 
 $start_x = -1
 $start_y = -1
@@ -142,7 +142,7 @@ while base.status == WORKING
 end
 
 loops = 0
-for pos in positions
+for pos in positions.uniq
   solver = Solver.new(pos[0], pos[1])
   loops += 1 if solver.loop?()
 end
