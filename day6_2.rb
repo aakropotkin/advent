@@ -12,7 +12,7 @@ for x in 0..MAT.length-1
     if MAT[x][y] == '^' || MAT[x][y] == 'v' ||
        MAT[x][y] == '<' || MAT[x][y] == '>'
       $start_x = x
-      $start_y = x
+      $start_y = y
       $start_direction = MAT[x][y]
       break
     end
@@ -109,25 +109,27 @@ class Solver
   end
 
   def to_s
+    result = ''
     for x in 0..@mat.length-1
       for y in 0..@mat[x].length-1
         if x == $start_x && y == $start_y
-          print $start_direction
+          result += $start_direction
         elsif @mat[x][y] == '#' || @mat[x][y] == 'O'
-          print @mat[x][y]
+          result += @mat[x][y]
         elsif ( @shadow[x][y].include?('^') || @shadow[x][y].include?('v') ) &&
               ( @shadow[x][y].include?('<') || @shadow[x][y].include?('>') )
-          print '+'
+          result += '+'
         elsif @shadow[x][y].include?('^') || @shadow[x][y].include?('v')
-          print '|'
+          result += '|'
         elsif @shadow[x][y].include?('<') || @shadow[x][y].include?('>')
-          print '-'
+          result += '-'
         else
-          print @mat[x][y]
+          result += @mat[x][y]
         end
       end
-      puts
+      result += "\n"
     end
+    return result
   end
 end
 
@@ -142,8 +144,6 @@ end
 loops = 0
 for pos in positions
   solver = Solver.new(pos[0], pos[1])
-  puts solver.to_s
-  puts
   loops += 1 if solver.loop?()
 end
 puts loops
