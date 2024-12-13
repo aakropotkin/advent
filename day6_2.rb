@@ -52,9 +52,7 @@ class Solver
         y += 1
     end
 
-    if x < 0 || y < 0 || x >= @mat.length || y >= @mat[x].length
-      return EXITED
-    end
+    return EXITED if x < 0 || y < 0 || x >= @mat.length || y >= @mat[x].length
 
     if @mat[x][y] == '#' || @mat[x][y] == 'O'
       case @direction
@@ -67,22 +65,16 @@ class Solver
         when '>'
           @direction = 'v'
       end
-      if @shadow[@x][@y].include?(@direction)
-        return LOOPED
-      else
-        @shadow[@x][@y] << @direction
-        return WORKING
-      end
+      return LOOPED if @shadow[@x][@y].include?(@direction)
+      @shadow[@x][@y] << @direction
+      return WORKING
     end
 
     @x = x
     @y = y
-    if @shadow[@x][@y].include?(@direction)
-      return LOOPED
-    else
-      @shadow[@x][@y] << @direction
-      return WORKING
-    end
+    return LOOPED if @shadow[@x][@y].include?(@direction)
+    @shadow[@x][@y] << @direction
+    return WORKING
   end
 
   def loop?()
