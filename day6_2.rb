@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-MAT = File.readlines('day6.in', chomp: true).map(&:chars)
+MAT = File.readlines('day6_simple.in', chomp: true).map(&:chars)
 
 $start_x = -1
 $start_y = -1
@@ -28,7 +28,7 @@ class Solver
   def initialize(block_x, block_y)
     @mat = MAT.map(&:dup)
     if block_x != -1 && block_y != -1
-      @mat[block_x][block_y] = '#'
+      @mat[block_x][block_y] = 'O'
     end
     @x = $start_x
     @y = $start_y
@@ -56,7 +56,7 @@ class Solver
       return EXITED
     end
 
-    if @mat[x][y] == '#'
+    if @mat[x][y] == '#' || @mat[x][y] == 'O'
       case @direction
         when '^'
           @direction = '>'
@@ -107,6 +107,28 @@ class Solver
   def y
     return @y
   end
+
+  def to_s
+    for x in 0..@mat.length-1
+      for y in 0..@mat[x].length-1
+        if x == $start_x && y == $start_y
+          print $start_direction
+        elsif @mat[x][y] == '#' || @mat[x][y] == 'O'
+          print @mat[x][y]
+        elsif ( @shadow[x][y].include?('^') || @shadow[x][y].include?('v') ) &&
+              ( @shadow[x][y].include?('<') || @shadow[x][y].include?('>') )
+          print '+'
+        elsif @shadow[x][y].include?('^') || @shadow[x][y].include?('v')
+          print '|'
+        elsif @shadow[x][y].include?('<') || @shadow[x][y].include?('>')
+          print '-'
+        else
+          print @mat[x][y]
+        end
+      end
+      puts
+    end
+  end
 end
 
 # Find original path
@@ -120,8 +142,8 @@ end
 loops = 0
 for pos in positions
   solver = Solver.new(pos[0], pos[1])
-  if solver.loop?()
-    loops += 1
-  end
+  puts solver.to_s
+  puts
+  loops += 1 if solver.loop?()
 end
 puts loops
