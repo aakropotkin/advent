@@ -22,10 +22,12 @@ end
 
 # A topographical map
 class TopoMap
-  attr_accessor :map
+  attr_accessor :map, :scores
 
   def initialize(map)
-    @map = map
+    @map = map.map(&:dup)
+    @scores = map.map { |row| row.map { [] } }
+    process_scores
   end
 
   def width
@@ -37,7 +39,7 @@ class TopoMap
   end
 
   def print_map
-    @map.each { |row| puts row.join(', ') }
+    @map.each { |row| puts row.join('') }
   end
 
   def trailheads
@@ -50,9 +52,67 @@ class TopoMap
     trailheads
   end
 
+  def trailends
+    trailends = []
+    (0..(self.height - 1)).each do |i|
+      (0..(self.width - 1)).each do |j|
+        trailends << Position.new(i, j) if @map[i][j] == 9
+      end
+    end
+    trailends
+  end
+
+  private :trailends
+
   def valid?(position)
     (position.row >= 0) && (position.row < height) &&
       (position.column >= 0) && (position.column < width)
+  end
+
+  def prevs(position)
+    positions = []
+    return positions unless valid?(position)
+
+    want = @map[position.row][position.column] - 1
+    return positions if want < 0
+
+    try = Position.new(position.row - 1, position.column)
+    positions << try if valid?(try) && @map[try.row][try.column] == want
+    try = Position.new(position.row + 1, position.column)
+    positions << try if valid?(try) && @map[try.row][try.column] == want
+    try = Position.new(position.row, position.column - 1)
+    positions << try if valid?(try) && @map[try.row][try.column] == want
+    try = Position.new(position.row, position.column + 1)
+    positions << try if valid?(try) && @map[try.row][try.column] == want
+    positions
+  end
+
+  private :prevs
+
+  def process_score(start, position)
+    if @map[position.row][position.column].zero?
+      @scores[position.row][position.column] << start unless
+        @scores[position.row][position.column].include?(start)
+    else
+      prevs(position).each { |pos| process_score(start, pos) }
+    end
+  end
+
+  private :process_score
+
+  def process_scores
+    trailends.each { |position| process_score(position, position) }
+    @processed = true
+  end
+
+  private :process_scores
+
+  def scores_sum
+    sum = 0
+    trailheads.each do |position|
+      sum += @scores[position.row][position.column].length
+    end
+    sum
   end
 end
 
@@ -60,3 +120,4 @@ map = File.readlines('day10.in', chomp: true).map { |l| l.chars.map(&:to_i) }
 topo_map = TopoMap.new(map)
 
 topo_map.print_map
+puts topo_map.scores_sum
