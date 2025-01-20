@@ -7,13 +7,14 @@ def split_integer(int)
   return [int] if as_str.length.odd?
 
   mid = as_str.length / 2
-  [as_str[0...mid].to_i, as_str[mid..-1].to_i]
+  [as_str[0...mid].to_i, as_str[mid..].to_i]
 end
 
 MEMO = {}
+
 def expand(stone, times)
   return 1 if times.zero?
-  return MEMO[[stone, times]] if MEMO.key?([stone, times])
+  return MEMO[[stone, times]] if MEMO[[stone, times]]
 
   MEMO[[stone, times]] =
     if stone.zero?
