@@ -63,6 +63,11 @@ class Region
     perimeter
   end
 
+  def sides
+    edges = positions.select { |position| neighbors(position).length < 4 }
+    # I honestly don't know what to do next...
+  end
+
   def cost
     area * perimeter
   end
